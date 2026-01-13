@@ -2,6 +2,9 @@ import os
 import sys
 from colorama import Fore, Back, Style
 
+def adicionar_produto():
+    tarefa = input('digite um produto')
+
 def sair():
     limpar_tela()
     titulo_menu('Confirmação de Saída')
@@ -21,10 +24,10 @@ def pausar():
     input('Digite ENTER para continuar ...')
 
 def selecionar_opcao(opcao):
-    if opcao == "1":
-        print("teste 01")
+    if opcao == "1":            # adicionar_produto()
+        adicionar_produto()
         pausar()
-#         # adicionar_produto()
+
     elif opcao == "2":
         print("teste 02")
         pausar()
