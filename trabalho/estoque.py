@@ -1,27 +1,47 @@
-
+import os
+import sys
 from colorama import Fore, Back, Style
-# def sair():
-#     exit
 
- def selecionar_opcao(opcao):
-    print("ttessttee ---->")
-#     if opcao == "1":
-#         print("teste 01")
+def sair():
+    limpar_tela()
+    titulo_menu('Confirmação de Saída')
+
+    confirmacao=input('Deseja realmente sair do sistema? (S/N)  ').strip().upper()
+    if confirmacao == 'S':
+        print(Fore.RED + '\nEncerrando o sistema\n\n' + Style.RESET_ALL)
+        sys.exit()                          #fecha o programa
+    else:
+        return
+
+
+def limpar_tela():
+    os.system('cls' if os.name == 'nt' else 'clear')  # usar cls para Windows / clear para linux
+
+def pausar():
+    input('Digite ENTER para continuar ...')
+
+def selecionar_opcao(opcao):
+    if opcao == "1":
+        print("teste 01")
+        pausar()
 #         # adicionar_produto()
-#     elif opcao == "2":
-#         print("teste 02")
+    elif opcao == "2":
+        print("teste 02")
+        pausar()
 #         # listar_produto()
-#     elif opcao == "3":
-#         print("teste 03")
+    elif opcao == "3":
+        print("teste 03")
+        pausar()
 #         # atualizar_produto()
-#     elif opcao == "4":
-#         print("teste 04")
+    elif opcao == "4":
+        print("teste 04")
+        pausar()
 #         # excluir_produto()
-#     elif opcao == "0":
-#         print("teste sair")
-#         sair()
-# else:
-#     print("Opção inválida. Escolha uma opção do menu")
+    elif opcao == "0":
+       sair()
+    else:
+        print("Opção inválida. Escolha uma opção do menu")
+        pausar()
 
 
 def titulo_menu(titulo):
@@ -36,21 +56,22 @@ def titulo_menu(titulo):
     print(Fore.BLUE + Back.WHITE + linha_menu + Style.RESET_ALL)
 
 def itens_menu():
-    itens = ('1 - adicionar Novo Produto', '2 - Atualizar Produtos','3 - Visualizar Produtos existentes', '4 - Registrar e controlar vendas', '0 - Sair')
+    itens = ('1 - Adicionar novo produto', '2 - Atualizar produtos', '3 - Excluir produto','4 - Visualizar produtos existentes', '5 - Registrar e controlar vendas', '0 - Sair')
     for item in itens:
         print(item)
 
-def exibir_menu(): #Menu principal
-    titulo_menu('MENU')
-    itens_menu()
+def exibir_menu():
+    limpar_tela()
+    titulo_menu('MENU')     #chama def exibir titulo do menu
+    itens_menu()            #chama def exibir itens do menu
 
 
 def iniciar_sistema():
-    exibir_menu()
-    # opcao_escolhida = input("Escolha uma das opções: ")
-    # selecionar_opcao(opcao_escolhida)
-    # print(selecionar_opcao)
-    # iniciar_sistema() # mudar para um while para não ficar consumindo recurso.
+    opcao_escolhida = ""
+    while True:
+        exibir_menu()
+        opcao_escolhida = input("Escolha uma das opções: ")
+        selecionar_opcao(opcao_escolhida)
 
 
 iniciar_sistema()
