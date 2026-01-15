@@ -7,16 +7,38 @@ bd_produto = [] # banco de dados (apenas na memoria)
 
 def adicionar_produto():
     limpar_tela()
-    titulo_menu("Incluir produto", Fore.BLACK ,Fore.LIGHTGREEN_EX)
-    print()
+    titulo_menu("Incluir produto", cor_laterais=Fore.LIGHTGREEN_EX,espacamento=1)
     nome = input('digite o nome do produto:  ') # primeiro pega o nome para verificacao e posterior inclusao
     
-    if not nome:
-        
+    if not nome:                                # se estiver vazio, cancela
         print(Fore.YELLOW + "\nOperação cancelada: Nome vazio." + Style.RESET_ALL)
+        pausar()
+        return
 
-    #bd_produto.append(nome)
-    #print(bd_produto)
+    for produto in bd_produto:
+        if produto['nome'].lower() == nome.lower():
+            print(Fore.YELLOW + f'O produto {Fore.RED + nome + Fore.YELLOW} já existe!' + Style.RESET_ALL)
+            pausar()
+    
+
+    try:
+        limpar_tela()
+        titulo_menu("Incluir produto", Fore.BLACK ,Fore.LIGHTGREEN_EX,1)
+
+        preco = float(input(f'Digite o preço do {Fore.YELLOW + nome + Style.RESET_ALL} \n(R$):'))
+        quantidade = int(input('Digite a quantidade em estoque:  '))
+    except:
+        return
+
+    novo_produto = {
+        'nome': nome,
+        'preco':preco,
+        'quantidade':quantidade
+    }
+
+    bd_produto.append(novo_produto)
+    print(bd_produto)
+    pausar()
 
 
 
@@ -64,7 +86,7 @@ def selecionar_opcao(opcao):
         pausar()
 
 
-def titulo_menu(titulo, cor_texto=Fore.BLUE, cor_laterais=Fore.BLUE):
+def titulo_menu(titulo, cor_texto=Fore.BLUE, cor_laterais=Fore.BLUE, espacamento=0):
     print()
     texto_central = ' ' + titulo +' '   # afastar o texto do menu das laterais 1 caracter de cada lado
     largura_menu = 70                   # definir largura total em caracteres do titulo do menu
@@ -73,13 +95,16 @@ def titulo_menu(titulo, cor_texto=Fore.BLUE, cor_laterais=Fore.BLUE):
     largura_lados_menu = (largura_menu - largura_texto_central) // 2    # determina o tamanho dos lados do menu
     lados = '#'*largura_lados_menu                                      # ja cria os os lados facilitando jogar no print com cores
 
-    #linha_menu = '#'*largura_lados_menu + texto_central + '#'*largura_lados_menu    # texto a ser exibido no titulo menu
+    # texto a ser exibido no titulo menu
     print(Back.WHITE + cor_laterais + lados + cor_texto + texto_central + cor_laterais + lados + Style.RESET_ALL)
+
+    if espacamento>0:
+        print('\n' * espacamento)
 
 def itens_menu():
     itens = ('1 - Adicionar novo produto', '2 - Atualizar produtos', '3 - Excluir produto','4 - Visualizar produtos existentes', '5 - Registrar e controlar vendas', '0 - Sair')
     for item in itens:
-        print(item)
+        print(item)     
 
 def exibir_menu():
     limpar_tela()
