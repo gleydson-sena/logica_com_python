@@ -7,7 +7,7 @@ bd_produto = [] # banco de dados (apenas na memoria)
 
 def adicionar_produto():
     limpar_tela()
-    titulo_menu("Incluir produto", cor_laterais=Fore.LIGHTGREEN_EX,espacamento=1)
+    titulo_menu("Incluir produto", Fore.BLACK,Fore.LIGHTGREEN_EX,1)
     nome = input('digite o nome do produto:  ') # primeiro pega o nome para verificacao e posterior inclusao
     
     if not nome:                                # se estiver vazio, cancela
@@ -17,7 +17,7 @@ def adicionar_produto():
 
     for produto in bd_produto:
         if produto['nome'].lower() == nome.lower():
-            print(Fore.YELLOW + f'O produto {Fore.RED + nome + Fore.YELLOW} já existe!' + Style.RESET_ALL)
+            print(Fore.YELLOW + f'O produto {Fore.RED}{nome}{Fore.YELLOW} já existe!' + Style.RESET_ALL)
             pausar()
     
 
@@ -25,20 +25,23 @@ def adicionar_produto():
         limpar_tela()
         titulo_menu("Incluir produto", Fore.BLACK ,Fore.LIGHTGREEN_EX,1)
 
-        preco = float(input(f'Digite o preço do {Fore.YELLOW + nome + Style.RESET_ALL} \n(R$):'))
-        quantidade = int(input('Digite a quantidade em estoque:  '))
-    except:
-        return
+        preco = float(input(f'Informe do {Fore.YELLOW}{nome}{Style.RESET_ALL} \n  Preço (R$):'))
+        quantidade = int(input('  Quantidade em estoque:  '))
 
-    novo_produto = {
+        novo_produto = {
         'nome': nome,
         'preco':preco,
         'quantidade':quantidade
-    }
+        }
+        bd_produto.append(novo_produto)
+        print()
+        return f'{Fore.YELLOW}{nome}{Fore.GREEN} incluido com {Fore.YELLOW}{quantidade}{Fore.GREEN} unidades em estoque, preço de R$ {Fore.YELLOW}{preco:.2f}{Fore.GREEN} - com sucesso!' + Style.RESET_ALL
+        # pausar()
+    except ValueError:
+        return f'{Fore.YELLOW}{nome}{Fore.RED} não foi incluido!' + Style.RESET_ALL
+    
 
-    bd_produto.append(novo_produto)
-    print(bd_produto)
-    pausar()
+    
 
 
 
@@ -63,7 +66,7 @@ def pausar():
 
 def selecionar_opcao(opcao):
     if opcao == "1":            # adicionar_produto()
-        adicionar_produto()
+        return adicionar_produto()
     elif opcao == "2":
         print("teste 02")
         pausar()
@@ -106,18 +109,26 @@ def itens_menu():
     for item in itens:
         print(item)     
 
-def exibir_menu():
+def exibir_menu(mensagem=""):
     limpar_tela()
     titulo_menu('MENU')     #chama def exibir titulo do menu
     itens_menu()            #chama def exibir itens do menu
 
+    if mensagem:
+        print(f'\n{mensagem}')
 
 def iniciar_sistema():
     opcao_escolhida = ""
+    mensagem_status=""
     while True:
-        exibir_menu()
+        exibir_menu(mensagem_status)
+        mensagem_status=""
         opcao_escolhida = input("Escolha uma das opções: ")
-        selecionar_opcao(opcao_escolhida)
+        resultado  = selecionar_opcao(opcao_escolhida)
+
+        if resultado:
+            mensagem_status = resultado
+            print(mensagem_status)
 
 
 iniciar_sistema()
