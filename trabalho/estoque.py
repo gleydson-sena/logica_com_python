@@ -2,16 +2,32 @@ import os
 import sys
 from colorama import Fore, Back, Style
 
+bd_produto = [] # banco de dados (apenas na memoria)
+
+
 def adicionar_produto():
-    tarefa = input('digite um produto')
+    limpar_tela()
+    titulo_menu("Incluir produto", Fore.BLACK ,Fore.LIGHTGREEN_EX)
+    print()
+    nome = input('digite o nome do produto:  ') # primeiro pega o nome para verificacao e posterior inclusao
+    
+    if not nome:
+        
+        print(Fore.YELLOW + "\nOperação cancelada: Nome vazio." + Style.RESET_ALL)
+
+    #bd_produto.append(nome)
+    #print(bd_produto)
+
+
 
 def sair():
     limpar_tela()
     titulo_menu('Confirmação de Saída')
 
-    confirmacao=input('Deseja realmente sair do sistema? (S/N)  ').strip().upper()
+    confirmacao=input('Deseja realmente sair do sistema? (S - para sair / outras retorna)  ').strip().upper()
     if confirmacao == 'S':
-        print(Fore.RED + '\nEncerrando o sistema\n\n' + Style.RESET_ALL)
+        limpar_tela()
+        print(Fore.RED + '\n\n    Sistema Encerrando!\n\n' + Style.RESET_ALL)
         sys.exit()                          #fecha o programa
     else:
         return
@@ -26,37 +42,39 @@ def pausar():
 def selecionar_opcao(opcao):
     if opcao == "1":            # adicionar_produto()
         adicionar_produto()
-        pausar()
-
     elif opcao == "2":
         print("teste 02")
         pausar()
 #         # listar_produto()
+
     elif opcao == "3":
         print("teste 03")
         pausar()
 #         # atualizar_produto()
+
     elif opcao == "4":
         print("teste 04")
         pausar()
 #         # excluir_produto()
+
     elif opcao == "0":
        sair()
     else:
-        print("Opção inválida. Escolha uma opção do menu")
+        print(Fore.RED+"Opção inválida. Escolha uma opção do menu"+Style.RESET_ALL)
         pausar()
 
 
-def titulo_menu(titulo):
+def titulo_menu(titulo, cor_texto=Fore.BLUE, cor_laterais=Fore.BLUE):
     print()
     texto_central = ' ' + titulo +' '   # afastar o texto do menu das laterais 1 caracter de cada lado
     largura_menu = 70                   # definir largura total em caracteres do titulo do menu
 
     largura_texto_central = len(texto_central)                          # determina o tamanho do texto central do menu
     largura_lados_menu = (largura_menu - largura_texto_central) // 2    # determina o tamanho dos lados do menu
+    lados = '#'*largura_lados_menu                                      # ja cria os os lados facilitando jogar no print com cores
 
-    linha_menu = '#'*largura_lados_menu + texto_central + '#'*largura_lados_menu    # texto a ser exibido no titulo menu
-    print(Fore.BLUE + Back.WHITE + linha_menu + Style.RESET_ALL)
+    #linha_menu = '#'*largura_lados_menu + texto_central + '#'*largura_lados_menu    # texto a ser exibido no titulo menu
+    print(Back.WHITE + cor_laterais + lados + cor_texto + texto_central + cor_laterais + lados + Style.RESET_ALL)
 
 def itens_menu():
     itens = ('1 - Adicionar novo produto', '2 - Atualizar produtos', '3 - Excluir produto','4 - Visualizar produtos existentes', '5 - Registrar e controlar vendas', '0 - Sair')
