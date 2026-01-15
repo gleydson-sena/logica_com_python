@@ -5,6 +5,33 @@ from colorama import Fore, Back, Style
 bd_produto = [] # banco de dados (apenas na memoria)
 
 
+def visualizar_produtos():
+    limpar_tela()
+    titulo_menu("LISTA DE PRODUTOS", Fore.BLACK, Fore.CYAN, 1)
+
+    # verificar se o banco de dados não esta vazio
+    if not bd_produto:
+        return Fore.YELLOW + "O estoque está vazio. Cadastre algo primeiro." + Style.RESET_ALL
+    
+    limpar_tela()
+    titulo_menu("LISTA DE PRODUTOS", Fore.BLACK, Fore.CYAN, 1)
+
+    # cria o cabecalho definido o numero de caracteres e alinamento <esquerda, >direita
+    print(f"{Fore.CYAN}{'ID':<4}|{'NOME DO PRODUTO':<30}|{'PREÇO (R$)':>12}|{'QTD':>5}{Style.RESET_ALL}")
+    print("-" * 60)
+
+
+    # cria os itens do relatorio
+    for indice, produto in enumerate(bd_produto):
+        id_visual = indice + 1
+        nome = produto['nome']
+        preco = produto['preco']
+        qtd = produto['quantidade']
+
+        print(f'{id_visual:<4}|{nome:<30}|{preco:>12.2f}|{qtd:>5}')
+    print("-" * 60)
+    pausar()
+
 def adicionar_produto():
     limpar_tela()
     titulo_menu("Incluir produto", Fore.BLACK,Fore.LIGHTGREEN_EX,1)
@@ -40,10 +67,7 @@ def adicionar_produto():
     except ValueError:
         return f'{Fore.YELLOW}{nome}{Fore.RED} não foi incluido!' + Style.RESET_ALL
     
-
     
-
-
 
 def sair():
     limpar_tela()
@@ -78,9 +102,8 @@ def selecionar_opcao(opcao):
 #         # atualizar_produto()
 
     elif opcao == "4":
-        print("teste 04")
-        pausar()
-#         # excluir_produto()
+        return visualizar_produtos()
+
 
     elif opcao == "0":
        sair()
@@ -128,7 +151,6 @@ def iniciar_sistema():
 
         if resultado:
             mensagem_status = resultado
-            print(mensagem_status)
 
 
 iniciar_sistema()
