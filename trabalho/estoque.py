@@ -4,13 +4,109 @@ from colorama import Fore, Back, Style
 
 bd_produto = [] # banco de dados (apenas na memoria)
 
-def  atualizar_produto():
+def registrar_venda():
+    limpar_tela()
+    titulo_menu("REGISTRAR VENDA", Fore.BLACK, Fore.GREEN, 1)
+
+    # 1. Mostra os produtos disponíveis
+    if visualizar_produtos(pausa=False) == False:
+        return Fore.YELLOW + "Não há produtos para vender." + Style.RESET_ALL
+
+    print(Fore.YELLOW + "Digite 0 para cancelar" + Style.RESET_ALL)
+
+    try:
+        # 2. Escolha do Produto
+        id_escolhido = int(input('\nDigite o ID do produto vendido: '))
+        
+        if id_escolhido == 0:
+            return Fore.YELLOW + "Venda cancelada." + Style.RESET_ALL
+
+        indice = id_escolhido - 1
+
+        if 0 <= indice < len(bd_produto):
+            produto = bd_produto[indice]
+            
+            # Mostra o produto selecionado
+            print(f"\n{Fore.CYAN}Produto: {produto['nome']} | Preço: R$ {produto['preco']:.2f} | Estoque: {produto['quantidade']}{Style.RESET_ALL}")
+            
+            # 3. Escolha da Quantidade
+            qtd_venda = int(input('Quantas unidades foram vendidas? '))
+
+            # 4. REGRA DE NEGÓCIO: Tem estoque suficiente?
+            if qtd_venda > produto['quantidade']:
+                return Fore.RED + f"Erro: Estoque insuficiente! Só temos {produto['quantidade']} unidades." + Style.RESET_ALL
+            
+            if qtd_venda <= 0:
+                return Fore.RED + "Erro: Quantidade inválida." + Style.RESET_ALL
+
+            # 5. Cálculo e Baixa no Estoque
+            valor_total = qtd_venda * produto['preco']
+            produto['quantidade'] -= qtd_venda  # Subtrai do estoque
+
+            # 6. Cupom Fiscal (Resumo)
+            print("\n" + "="*40)
+            print(f"{Fore.GREEN}✅ VENDA REGISTRADA COM SUCESSO!{Style.RESET_ALL}")
+            print(f"Produto: {produto['nome']}")
+            print(f"Qtd: {qtd_venda} x R$ {produto['preco']:.2f}")
+            print(f"{Fore.GREEN}TOTAL A RECEBER: R$ {valor_total:.2f}{Style.RESET_ALL}")
+            print("="*40)
+            
+            pausar() # Pausa para ver o valor total
+            return "" # Retorna vazio pois já mostramos o sucesso na tela
+
+        else:
+            return Fore.RED + "Erro: ID não encontrado." + Style.RESET_ALL
+
+    except ValueError:
+        return Fore.RED + "Erro: Digite apenas números." + Style.RESET_ALL
+
+
+def excluir_produto():
+    limpar_tela()
+    titulo_menu("EXCLUIR PRODUTO", Fore.BLACK, Fore.RED, 1)
+
+    if visualizar_produtos(pausa=False) == False:
+        return Fore.YELLOW + "Operação cancelada: Estoque vazio." + Style.RESET_ALL
+
+    print(Fore.YELLOW + "Digite 0 para cancelar" + Style.RESET_ALL)
+
+    try:
+        id_escolhido = int(input('\nDigite o ID do produto que deseja EXCLUIR: '))
+    
+        if id_escolhido == 0:
+            return Fore.YELLOW + "Operação cancelada." + Style.RESET_ALL
+        indice=id_escolhido - 1
+
+        if 0 <= indice < len(bd_produto):
+            produto = bd_produto[indice]
+
+            # Confirmação de segurança
+            print(f"\n{Fore.RED}ATENÇÃO! Você vai apagar: {produto['nome']}{Style.RESET_ALL}")
+            confirmacao = input("Tem certeza? (S para Sim / Enter para cancelar): ").strip().upper()
+
+            if confirmacao == 'S':
+                # 3. Remove da lista
+                removido = bd_produto.pop(indice)
+                return f"{Fore.GREEN}✅ Sucesso! O produto '{removido['nome']}' foi removido.{Style.RESET_ALL}"
+            else:
+                return Fore.YELLOW + "⚠ Exclusão cancelada pelo usuário." + Style.RESET_ALL
+
+        else:
+            return Fore.RED + "❌ Erro: ID não encontrado." + Style.RESET_ALL
+
+    except ValueError:
+        return Fore.RED + "❌ Erro: Digite apenas números válidos." + Style.RESET_ALL
+
+
+
+
+def atualizar_produto():
     limpar_tela()
     titulo_menu("Incluir produto", Fore.BLACK,Fore.LIGHTGREEN_EX,1)
 
     # verificar se o banco de dados não esta vazio
     if visualizar_produtos(pausa=False) == False:
-        return Fore.YELLOW + "Operação cancelada: Estoque vazio." + Style.RESET_AL
+        return Fore.YELLOW + "Operação cancelada: Estoque vazio." + Style.RESET_ALL
 
     print(Fore.YELLOW + "Digite 0 para cancelar" + Style.RESET_ALL)
     try:
@@ -47,12 +143,12 @@ def visualizar_produtos(pausa=True):
 
     # verificar se o banco de dados não esta vazio
     if not bd_produto:
-        if not bd_produto:
-            if pausa:
-                return Fore.YELLOW + "O estoque está vazio. Cadastre algo primeiro." + Style.RESET_ALL
-            else:
-                print(Fore.YELLOW + "O estoque está vazio." + Style.RESET_ALL)
-                return False
+
+        if pausa:
+            return Fore.YELLOW + "O estoque está vazio. Cadastre algo primeiro." + Style.RESET_ALL
+        else:
+            print(Fore.YELLOW + "O estoque está vazio." + Style.RESET_ALL)
+            return False
     
     # cria o cabecalho definido o numero de caracteres e alinamento <esquerda, >direita
     print(f"{Fore.CYAN}{'ID':<4}|{'NOME DO PRODUTO':<30}|{'PREÇO (R$)':>12}|{'QTD':>5}{Style.RESET_ALL}")
@@ -133,22 +229,16 @@ def pausar():
     input('Digite ENTER para continuar ...')
 
 def selecionar_opcao(opcao):
-    if opcao == "1":            # adicionar_produto()
+    if opcao == "1":
         return adicionar_produto()
     elif opcao == "2":
         return atualizar_produto()
-        #pausar()
-
-
     elif opcao == "3":
-        print("teste 03")
-        pausar()
-#         # atualizar_produto()
-
+        return excluir_produto()
     elif opcao == "4":
         return visualizar_produtos()
-
-
+    else opcao == "5":
+        return registrar_venda()
     elif opcao == "0":
        sair()
     else:
