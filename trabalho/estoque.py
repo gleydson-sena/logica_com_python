@@ -4,18 +4,56 @@ from colorama import Fore, Back, Style
 
 bd_produto = [] # banco de dados (apenas na memoria)
 
+def  atualizar_produto():
+    limpar_tela()
+    titulo_menu("Incluir produto", Fore.BLACK,Fore.LIGHTGREEN_EX,1)
 
-def visualizar_produtos():
+    # verificar se o banco de dados não esta vazio
+    if visualizar_produtos(pausa=False) == False:
+        return Fore.YELLOW + "Operação cancelada: Estoque vazio." + Style.RESET_AL
+
+    print(Fore.YELLOW + "Digite 0 para cancelar" + Style.RESET_ALL)
+    try:
+        id_escolhido = int(input('\nDigite o ID do produto que deseja alterar: '))
+        
+        if id_escolhido == 0:
+            return Fore.YELLOW + "Operação cancelada." + Style.RESET_ALL
+        
+        indice = id_escolhido - 1           #indice inicia 1, id inicia 0 por isto subtracao
+
+        if 0 <= indice < len(bd_produto):
+            produto = bd_produto[indice]
+
+            print(f"\n{Fore.CYAN}Alterando: {produto['nome']}{Style.RESET_ALL}")
+
+            novo_preco = float(input('Novo Preço (R$): '))
+            nova_qtd = int(input('Nova Quantidade: '))
+
+            produto['preco'] = novo_preco
+            produto['quantidade'] = nova_qtd
+
+            return f"{Fore.GREEN}Sucesso! {produto['nome']} atualizado.{Style.RESET_ALL}"
+        
+        else:
+            return Fore.RED + "Erro: ID não encontrado." + Style.RESET_ALL
+    except ValueError:
+        return Fore.RED + "Erro: Digite apenas números válidos." + Style.RESET_ALL
+
+
+
+def visualizar_produtos(pausa=True):
     limpar_tela()
     titulo_menu("LISTA DE PRODUTOS", Fore.BLACK, Fore.CYAN, 1)
 
     # verificar se o banco de dados não esta vazio
     if not bd_produto:
-        return Fore.YELLOW + "O estoque está vazio. Cadastre algo primeiro." + Style.RESET_ALL
+        if not bd_produto:
+            if pausa:
+                return Fore.YELLOW + "O estoque está vazio. Cadastre algo primeiro." + Style.RESET_ALL
+            else:
+                print(Fore.YELLOW + "O estoque está vazio." + Style.RESET_ALL)
+                return False
     
-    limpar_tela()
-    titulo_menu("LISTA DE PRODUTOS", Fore.BLACK, Fore.CYAN, 1)
-
     # cria o cabecalho definido o numero de caracteres e alinamento <esquerda, >direita
     print(f"{Fore.CYAN}{'ID':<4}|{'NOME DO PRODUTO':<30}|{'PREÇO (R$)':>12}|{'QTD':>5}{Style.RESET_ALL}")
     print("-" * 60)
@@ -30,7 +68,14 @@ def visualizar_produtos():
 
         print(f'{id_visual:<4}|{nome:<30}|{preco:>12.2f}|{qtd:>5}')
     print("-" * 60)
-    pausar()
+    
+    if pausa:
+        pausar() # Só pausa se for chamado pelo menu principal (Opção 4)
+        return ''
+    else:
+        return True
+
+
 
 def adicionar_produto():
     limpar_tela()
@@ -66,9 +111,8 @@ def adicionar_produto():
         # pausar()
     except ValueError:
         return f'{Fore.YELLOW}{nome}{Fore.RED} não foi incluido!' + Style.RESET_ALL
-    
-    
 
+ 
 def sair():
     limpar_tela()
     titulo_menu('Confirmação de Saída')
@@ -92,9 +136,9 @@ def selecionar_opcao(opcao):
     if opcao == "1":            # adicionar_produto()
         return adicionar_produto()
     elif opcao == "2":
-        print("teste 02")
-        pausar()
-#         # listar_produto()
+        return atualizar_produto()
+        #pausar()
+
 
     elif opcao == "3":
         print("teste 03")
