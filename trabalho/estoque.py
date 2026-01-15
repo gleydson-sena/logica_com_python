@@ -89,7 +89,7 @@ def excluir_produto():
                 removido = bd_produto.pop(indice)
                 return f"{Fore.GREEN}✅ Sucesso! O produto '{removido['nome']}' foi removido.{Style.RESET_ALL}"
             else:
-                return Fore.YELLOW + "⚠ Exclusão cancelada pelo usuário." + Style.RESET_ALL
+                return Fore.YELLOW + "Exclusão cancelada pelo usuário." + Style.RESET_ALL
 
         else:
             return Fore.RED + "❌ Erro: ID não encontrado." + Style.RESET_ALL
@@ -237,7 +237,7 @@ def selecionar_opcao(opcao):
         return excluir_produto()
     elif opcao == "4":
         return visualizar_produtos()
-    else opcao == "5":
+    elif opcao == "5":
         return registrar_venda()
     elif opcao == "0":
        sair()
