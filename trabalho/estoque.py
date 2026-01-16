@@ -3,49 +3,78 @@ import sys
 from colorama import Fore, Back, Style
 
 bd_produto = [] # banco de dados (apenas na memoria)
+bd_vendas = []  # banco de dados (apenas na memoria)
+
+
+def validar_indice(indice, lista):      # Verifica se o índice está dentro dos limites da lista.
+    if 0 <= indice < len(lista):
+        return True
+    else:
+        print(Fore.RED + "Erro: ID não encontrado na lista. Tente novamente." + Style.RESET_ALL)
+        pausar()
+        return False
+
 
 def registrar_venda():
-    limpar_tela()
-    titulo_menu("REGISTRAR VENDA", Fore.BLACK, Fore.GREEN, 1)
+    while True:
+        limpar_tela()
+        titulo_menu("REGISTRAR VENDA", Fore.BLACK, Fore.GREEN, 1)
 
-    # 1. Mostra os produtos disponíveis
-    if visualizar_produtos(pausa=False) == False:
-        return Fore.YELLOW + "Não há produtos para vender." + Style.RESET_ALL
+        if visualizar_produtos(pausa=False) == False:                               # Mostra os produtos disponíveis
+            return Fore.YELLOW + "Não há produtos para vender." + Style.RESET_ALL
 
-    print(Fore.YELLOW + "Digite 0 para cancelar" + Style.RESET_ALL)
+        print(Fore.YELLOW + "Digite 0 para cancelar" + Style.RESET_ALL)
 
-    try:
-        # 2. Escolha do Produto
-        id_escolhido = int(input('\nDigite o ID do produto vendido: '))
+        try:
+            id_input = input('\nDigite o ID do produto vendido: ')     # Escolha do Produto pelo indice da primeira coluna
         
-        if id_escolhido == 0:
-            return Fore.YELLOW + "Venda cancelada." + Style.RESET_ALL
+            if not id_input.isdigit():
+                print(Fore.RED + "Erro: Digite apenas números inteiros." + Style.RESET_ALL)
+                pausar()
+                continue # Volta para o início do while (redesenha a tela)
 
-        indice = id_escolhido - 1
+            id_escolhido = int(id_input)
 
-        if 0 <= indice < len(bd_produto):
+            if id_escolhido == 0:
+                return Fore.YELLOW + "Operação cancelada." + Style.RESET_ALL
+
+            indice = id_escolhido - 1
+
+            if not validar_indice(indice, bd_produto):          # verificar se o id existe
+                continue
+
             produto = bd_produto[indice]
-            
+
             # Mostra o produto selecionado
             print(f"\n{Fore.CYAN}Produto: {produto['nome']} | Preço: R$ {produto['preco']:.2f} | Estoque: {produto['quantidade']}{Style.RESET_ALL}")
-            
-            # 3. Escolha da Quantidade
-            qtd_venda = int(input('Quantas unidades foram vendidas? '))
 
-            # 4. REGRA DE NEGÓCIO: Tem estoque suficiente?
-            if qtd_venda > produto['quantidade']:
+            qtd_input = input('Quantas unidades foram vendidas? ')
+
+            qtd_venda = int(qtd_input)
+
+            if qtd_venda > produto['quantidade']:           # Tem estoque suficiente?
                 return Fore.RED + f"Erro: Estoque insuficiente! Só temos {produto['quantidade']} unidades." + Style.RESET_ALL
             
             if qtd_venda <= 0:
-                return Fore.RED + "Erro: Quantidade inválida." + Style.RESET_ALL
+                print(Fore.RED + "Erro: A quantidade deve ser maior que zero." + Style.RESET_ALL)
+                pausar()
+                continue
 
-            # 5. Cálculo e Baixa no Estoque
-            valor_total = qtd_venda * produto['preco']
-            produto['quantidade'] -= qtd_venda  # Subtrai do estoque
+            valor_total = qtd_venda * produto['preco']      # Cálculo e Baixa no Estoque
+            produto['quantidade'] -= qtd_venda              # Subtrai do estoque
 
-            # 6. Cupom Fiscal (Resumo)
+            nova_venda = {
+                'produto': produto['nome'],
+                'valor_unitario': produto['preco'], 
+                'qtd': qtd_venda,
+                'total': valor_total
+            }
+            bd_vendas.append(nova_venda)
+
+
+            # (Resumo)
             print("\n" + "="*40)
-            print(f"{Fore.GREEN}✅ VENDA REGISTRADA COM SUCESSO!{Style.RESET_ALL}")
+            print(f"{Fore.GREEN}VENDA REGISTRADA COM SUCESSO!{Style.RESET_ALL}")
             print(f"Produto: {produto['nome']}")
             print(f"Qtd: {qtd_venda} x R$ {produto['preco']:.2f}")
             print(f"{Fore.GREEN}TOTAL A RECEBER: R$ {valor_total:.2f}{Style.RESET_ALL}")
@@ -54,11 +83,9 @@ def registrar_venda():
             pausar() # Pausa para ver o valor total
             return "" # Retorna vazio pois já mostramos o sucesso na tela
 
-        else:
-            return Fore.RED + "Erro: ID não encontrado." + Style.RESET_ALL
-
-    except ValueError:
-        return Fore.RED + "Erro: Digite apenas números." + Style.RESET_ALL
+        except ValueError:
+            print(Fore.RED + "Erro: Digite apenas números." + Style.RESET_ALL)
+            pausar()
 
 
 def excluir_produto():
@@ -239,6 +266,11 @@ def selecionar_opcao(opcao):
         return visualizar_produtos()
     elif opcao == "5":
         return registrar_venda()
+    elif opcao =="6":
+        return cancelar_venda()
+    elif opcao =="7":
+        return relatorio_vendas()
+
     elif opcao == "0":
        sair()
     else:
@@ -262,7 +294,7 @@ def titulo_menu(titulo, cor_texto=Fore.BLUE, cor_laterais=Fore.BLUE, espacamento
         print('\n' * espacamento)
 
 def itens_menu():
-    itens = ('1 - Adicionar novo produto', '2 - Atualizar produtos', '3 - Excluir produto','4 - Visualizar produtos existentes', '5 - Registrar e controlar vendas', '0 - Sair')
+    itens = ('1 - Adicionar novo produto', '2 - Atualizar produtos', '3 - Excluir produto','4 - Visualizar produtos existentes', '5 - Registrar vendas', '6 - Cancelamento de vendas', '7 - Visualizana movimentação vendas', '0 - Sair')
     for item in itens:
         print(item)     
 
