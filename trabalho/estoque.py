@@ -6,6 +6,60 @@ bd_produto = [] # banco de dados (apenas na memoria)
 bd_vendas = []  # banco de dados (apenas na memoria)
 
 
+def cancelar_venda():
+    while True:
+        limpar_tela()
+        titulo_menu("CANCELAR VENDA", Fore.BLACK, Fore.RED, 1)
+        
+        if not bd_vendas:
+            return Fore.YELLOW + "Nenhuma venda para cancelar." + Style.RESET_ALL
+
+        print(f"{'ID':<4} | {'PRODUTO':<20} | {'TOTAL':>10}")
+        print("-" * 40)
+        for i, v in enumerate(bd_vendas):
+            print(f"{i+1:<4} | {v['produto']:<20} | {v['total']:>10.2f}")
+        print("-" * 40)
+
+        print(Fore.YELLOW + "Digite 0 para voltar" + Style.RESET_ALL)
+        
+        try:
+            id_input = input("\nID da venda para ESTORNAR: ")
+            if not id_input.isdigit(): continue
+            
+            id_venda = int(id_input)
+            if id_venda == 0: return ""
+
+            indice = id_venda - 1
+
+            if not validar_indice(indice, bd_vendas): continue
+
+            venda = bd_vendas[indice]
+            
+            # --- CONFIRMAÇÃO ---
+            print(f"\n{Fore.RED}ATENÇÃO! Estornar venda de: {venda['produto']} (Qtd: {venda['qtd']}){Style.RESET_ALL}")
+            confirma = input("Confirma o cancelamento? (S para Sim): ").strip().upper()
+
+            if confirma != 'S':
+                print(Fore.YELLOW + "Cancelamento abortado." + Style.RESET_ALL)
+                pausar()
+                continue
+
+            # --- EXECUÇÃO ---
+            # Devolve ao estoque
+            for p in bd_produto:
+                if p['nome'] == venda['produto']:
+                    p['quantidade'] += venda['qtd']
+                    break
+            
+            bd_vendas.pop(indice)
+            print(Fore.GREEN + "Venda estornada e estoque reposto!" + Style.RESET_ALL)
+            pausar()
+            return ""
+
+        except ValueError:
+            continue
+
+
 def relatorio_vendas():
     limpar_tela()
     titulo_menu("RELATÓRIO DE VENDAS", Fore.BLACK, Fore.MAGENTA, 1)
@@ -19,7 +73,7 @@ def relatorio_vendas():
     total_geral = 0
     for i, venda in enumerate(bd_vendas):
         total_geral += venda['total']
-        print(f"{i+1:<4} | {venda['produto']:<20} | {venda['qtd']:>5} | {venda['total']:>12.2f}")
+        print(f"{i+1:<4} | {venda['produto']:<20} | {venda['valor_unitario']:>10.2f} | {venda['qtd']:>5} | {venda['total']:>12.2f}")
 
     print("-" * 65)
     print(f"{Fore.GREEN}FATURAMENTO TOTAL: R$ {total_geral:.2f}{Style.RESET_ALL}")
