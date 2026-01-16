@@ -1,3 +1,26 @@
+"""
+--------------------------------------------------------------------------------
+PROJETO: SISTEMA DE CONTROLE DE ESTOQUE E VENDAS
+--------------------------------------------------------------------------------
+AUTOR: GLEYDSON REBOUCAS SENA
+RA:    183073
+CURSO: Engenharia da Computação
+REPOSITÓRIO GIT: https://github.com/gleydson-sena/logica_com_python
+
+DESCRIÇÃO:
+Sistema de gerenciamento de estoque e vendas via terminal, com persistência
+em memória.
+
+INSTRUÇÕES DE INSTALAÇÃO E EXECUÇÃO:
+1. Certifique-se de estar na pasta do projeto (ou com a venv ativa).
+2. Instale as dependências necessárias:
+   pip install -r requirements.txt
+
+3. Para rodar o sistema, execute o comando:
+   python estoque.py (Esta dentro da pasta trabalho)
+--------------------------------------------------------------------------------
+"""
+
 import os
 import sys
 from colorama import Fore, Back, Style
