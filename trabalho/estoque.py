@@ -14,11 +14,11 @@ def cancelar_venda():
         if not bd_vendas:
             return Fore.YELLOW + "Nenhuma venda para cancelar." + Style.RESET_ALL
 
-        print(f"{'ID':<4} | {'PRODUTO':<20} | {'TOTAL':>10}")
-        print("-" * 40)
+        print(f"{'ID':<4} | {'PRODUTO':<20} | {'VALOR':>10} | {'QTD':>5} | {'TOTAL':>12}")
+        print("-" * 65)
         for i, v in enumerate(bd_vendas):
-            print(f"{i+1:<4} | {v['produto']:<20} | {v['total']:>10.2f}")
-        print("-" * 40)
+            print(f"{i+1:<4} | {v['produto']:<20} | {v['valor_unitario']:>10.2f} | {v['qtd']:>5} | {v['total']:>12.2f}")
+        print("-" * 65)
 
         print(Fore.YELLOW + "Digite 0 para voltar" + Style.RESET_ALL)
         
@@ -168,22 +168,33 @@ def registrar_venda():
 
 
 def excluir_produto():
-    limpar_tela()
-    titulo_menu("EXCLUIR PRODUTO", Fore.BLACK, Fore.RED, 1)
+    while True:
+        limpar_tela()
+        titulo_menu("EXCLUIR PRODUTO", Fore.BLACK, Fore.RED, 1)
 
-    if visualizar_produtos(pausa=False) == False:
-        return Fore.YELLOW + "Operação cancelada: Estoque vazio." + Style.RESET_ALL
+        if visualizar_produtos(pausa=False) == False:
+            return Fore.YELLOW + "Operação cancelada: Estoque vazio." + Style.RESET_ALL
 
-    print(Fore.YELLOW + "Digite 0 para cancelar" + Style.RESET_ALL)
+        print(Fore.YELLOW + "Digite 0 para cancelar" + Style.RESET_ALL)
 
-    try:
-        id_escolhido = int(input('\nDigite o ID do produto que deseja EXCLUIR: '))
-    
-        if id_escolhido == 0:
-            return Fore.YELLOW + "Operação cancelada." + Style.RESET_ALL
-        indice=id_escolhido - 1
+        try:
+            id_input = input('\nDigite o ID do produto que deseja EXCLUIR: ')
+            if not id_input.isdigit():
+                print(Fore.RED + "Erro: Digite apenas números." + Style.RESET_ALL)
+                pausar()
+                continue
 
-        if 0 <= indice < len(bd_produto):
+            id_escolhido = int(id_input)
+        
+            if id_escolhido == 0:
+                return Fore.YELLOW + "Operação cancelada." + Style.RESET_ALL
+            
+            indice = id_escolhido - 1
+
+            # Agora usa sua função de validação!
+            if not validar_indice(indice, bd_produto):
+                continue
+
             produto = bd_produto[indice]
 
             # Confirmação de segurança
@@ -191,56 +202,68 @@ def excluir_produto():
             confirmacao = input("Tem certeza? (S para Sim / Enter para cancelar): ").strip().upper()
 
             if confirmacao == 'S':
-                # 3. Remove da lista
                 removido = bd_produto.pop(indice)
-                return f"{Fore.GREEN}✅ Sucesso! O produto '{removido['nome']}' foi removido.{Style.RESET_ALL}"
+                print(f"{Fore.GREEN}Sucesso! O produto '{removido['nome']}' foi removido.{Style.RESET_ALL}")
+                pausar()
+                return ""
             else:
-                return Fore.YELLOW + "Exclusão cancelada pelo usuário." + Style.RESET_ALL
+                print(Fore.YELLOW + "Exclusão cancelada pelo usuário." + Style.RESET_ALL)
+                pausar()
+                return ""
 
-        else:
-            return Fore.RED + "❌ Erro: ID não encontrado." + Style.RESET_ALL
-
-    except ValueError:
-        return Fore.RED + "❌ Erro: Digite apenas números válidos." + Style.RESET_ALL
-
+        except ValueError:
+            print(Fore.RED + "Erro: Digite apenas números válidos." + Style.RESET_ALL)
+            pausar()
 
 
 
 def atualizar_produto():
-    limpar_tela()
-    titulo_menu("Incluir produto", Fore.BLACK,Fore.LIGHTGREEN_EX,1)
+    while True:
+        limpar_tela()
+        titulo_menu("Incluir produto", Fore.BLACK,Fore.LIGHTGREEN_EX,1)
 
-    # verificar se o banco de dados não esta vazio
-    if visualizar_produtos(pausa=False) == False:
-        return Fore.YELLOW + "Operação cancelada: Estoque vazio." + Style.RESET_ALL
+        if visualizar_produtos(pausa=False) == False:
+            return Fore.YELLOW + "Operação cancelada: Estoque vazio." + Style.RESET_ALL
 
-    print(Fore.YELLOW + "Digite 0 para cancelar" + Style.RESET_ALL)
-    try:
-        id_escolhido = int(input('\nDigite o ID do produto que deseja alterar: '))
-        
-        if id_escolhido == 0:
-            return Fore.YELLOW + "Operação cancelada." + Style.RESET_ALL
-        
-        indice = id_escolhido - 1           #indice inicia 1, id inicia 0 por isto subtracao
+        print(Fore.YELLOW + "Digite 0 para cancelar" + Style.RESET_ALL)
+        try:
+            id_input = input('\nDigite o ID do produto que deseja alterar: ')
+            if not id_input.isdigit():
+                print(Fore.RED + "Erro: Digite apenas números." + Style.RESET_ALL)
+                pausar()
+                continue
 
-        if 0 <= indice < len(bd_produto):
+            id_escolhido = int(id_input)
+            
+            if id_escolhido == 0:
+                return Fore.YELLOW + "Operação cancelada." + Style.RESET_ALL
+            
+            indice = id_escolhido - 1
+
+            if not validar_indice(indice, bd_produto):
+                continue
+
             produto = bd_produto[indice]
 
             print(f"\n{Fore.CYAN}Alterando: {produto['nome']}{Style.RESET_ALL}")
 
-            novo_preco = float(input('Novo Preço (R$): '))
-            nova_qtd = int(input('Nova Quantidade: '))
+            # Pequena melhoria: aceita Enter para não mudar o valor
+            novo_preco_str = input('Novo Preço (R$) [Enter mantem]: ')
+            if novo_preco_str:
+                novo_preco = float(novo_preco_str.replace(',', '.'))
+                produto['preco'] = novo_preco
 
-            produto['preco'] = novo_preco
-            produto['quantidade'] = nova_qtd
+            nova_qtd_str = input('Nova Quantidade [Enter mantem]: ')
+            if nova_qtd_str:
+                produto['quantidade'] = int(nova_qtd_str)
 
-            return f"{Fore.GREEN}Sucesso! {produto['nome']} atualizado.{Style.RESET_ALL}"
-        
-        else:
-            return Fore.RED + "Erro: ID não encontrado." + Style.RESET_ALL
-    except ValueError:
-        return Fore.RED + "Erro: Digite apenas números válidos." + Style.RESET_ALL
-
+            print(f"{Fore.GREEN}Sucesso! {produto['nome']} atualizado.{Style.RESET_ALL}")
+            pausar()
+            return ""
+            
+        except ValueError:
+            print(Fore.RED + "Erro: Digite apenas números válidos." + Style.RESET_ALL)
+            pausar()
 
 
 def visualizar_produtos(pausa=True):
@@ -280,40 +303,59 @@ def visualizar_produtos(pausa=True):
 
 
 def adicionar_produto():
-    limpar_tela()
-    titulo_menu("Incluir produto", Fore.BLACK,Fore.LIGHTGREEN_EX,1)
-    nome = input('digite o nome do produto:  ') # primeiro pega o nome para verificacao e posterior inclusao
-    
-    if not nome:                                # se estiver vazio, cancela
-        print(Fore.YELLOW + "\nOperação cancelada: Nome vazio." + Style.RESET_ALL)
-        pausar()
-        return
-
-    for produto in bd_produto:
-        if produto['nome'].lower() == nome.lower():
-            print(Fore.YELLOW + f'O produto {Fore.RED}{nome}{Fore.YELLOW} já existe!' + Style.RESET_ALL)
-            pausar()
-    
-
-    try:
+    while True:
         limpar_tela()
-        titulo_menu("Incluir produto", Fore.BLACK ,Fore.LIGHTGREEN_EX,1)
+        titulo_menu("Incluir produto", Fore.BLACK,Fore.LIGHTGREEN_EX,1)
+        
+        print(Fore.YELLOW + "Digite 0 para cancelar" + Style.RESET_ALL)
+        nome = input('digite o nome do produto:  ') 
+        
+        if nome == '0': return "" # Opção de sair
+        
+        if not nome:
+            print(Fore.YELLOW + "\nOperação cancelada: Nome vazio." + Style.RESET_ALL)
+            pausar()
+            continue # Volta para o inicio
 
-        preco = float(input(f'Informe do {Fore.YELLOW}{nome}{Style.RESET_ALL} \n  Preço (R$):'))
-        quantidade = int(input('  Quantidade em estoque:  '))
+        # Verifica duplicidade
+        existe = False
+        for produto in bd_produto:
+            if produto['nome'].lower() == nome.lower():
+                print(Fore.YELLOW + f'O produto {Fore.RED}{nome}{Fore.YELLOW} já existe!' + Style.RESET_ALL)
+                pausar()
+                existe = True
+                break
+        if existe: continue
 
-        novo_produto = {
-        'nome': nome,
-        'preco':preco,
-        'quantidade':quantidade
-        }
-        bd_produto.append(novo_produto)
-        print()
-        return f'{Fore.YELLOW}{nome}{Fore.GREEN} incluido com {Fore.YELLOW}{quantidade}{Fore.GREEN} unidades em estoque, preço de R$ {Fore.YELLOW}{preco:.2f}{Fore.GREEN} - com sucesso!' + Style.RESET_ALL
-        # pausar()
-    except ValueError:
-        return f'{Fore.YELLOW}{nome}{Fore.RED} não foi incluido!' + Style.RESET_ALL
+        try:
+            limpar_tela()
+            titulo_menu("Incluir produto", Fore.BLACK ,Fore.LIGHTGREEN_EX,1)
 
+            preco_input = input(f'Informe do {Fore.YELLOW}{nome}{Style.RESET_ALL} \n  Preço (R$):')
+            preco = float(preco_input.replace(',', '.')) # Aceita virgula ou ponto
+
+            qtd_input = input('  Quantidade em estoque:  ')
+            if not qtd_input.isdigit():
+                print(Fore.RED + "Erro: Quantidade deve ser numero inteiro." + Style.RESET_ALL)
+                pausar()
+                continue
+            
+            quantidade = int(qtd_input)
+
+            novo_produto = {
+            'nome': nome,
+            'preco':preco,
+            'quantidade':quantidade
+            }
+            bd_produto.append(novo_produto)
+            print()
+            print(f'{Fore.YELLOW}{nome}{Fore.GREEN} incluido com {Fore.YELLOW}{quantidade}{Fore.GREEN} unidades em estoque, preço de R$ {Fore.YELLOW}{preco:.2f}{Fore.GREEN} - com sucesso!' + Style.RESET_ALL)
+            pausar()
+            return ""
+            
+        except ValueError:
+            print(Fore.RED + "Erro: Valor inválido inserido." + Style.RESET_ALL)
+            pausar()
  
 def sair():
     limpar_tela()
