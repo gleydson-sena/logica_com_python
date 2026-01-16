@@ -6,6 +6,31 @@ bd_produto = [] # banco de dados (apenas na memoria)
 bd_vendas = []  # banco de dados (apenas na memoria)
 
 
+def relatorio_vendas():
+    limpar_tela()
+    titulo_menu("RELATÓRIO DE VENDAS", Fore.BLACK, Fore.MAGENTA, 1)
+
+    if not bd_vendas:
+        return Fore.YELLOW + "Nenhuma venda registrada." + Style.RESET_ALL
+
+    print(f"{Fore.MAGENTA}{'ID':<4} | {'PRODUTO':<20} | {'VALOR':>10} | {'QTD':>5} | {'TOTAL':>12}{Style.RESET_ALL}")
+    print("-" * 65)
+
+    total_geral = 0
+    for i, venda in enumerate(bd_vendas):
+        total_geral += venda['total']
+        print(f"{i+1:<4} | {venda['produto']:<20} | {venda['qtd']:>5} | {venda['total']:>12.2f}")
+
+    print("-" * 65)
+    print(f"{Fore.GREEN}FATURAMENTO TOTAL: R$ {total_geral:.2f}{Style.RESET_ALL}")
+    
+    pausar()
+    return ""
+
+
+
+
+
 def validar_indice(indice, lista):      # Verifica se o índice está dentro dos limites da lista.
     if 0 <= indice < len(lista):
         return True
